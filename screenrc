@@ -1,97 +1,42 @@
 # -*- shell-script -*-
-shell /bin/zsh
+shell /bin/zsh -l
 bufferfile $HOME/.cache/screen-exchange
 startup_message off
 defscrollback 4096
-
-# Setting term might not be needed
-# term xterm-256color
-
-# emulate .logout message
 pow_detach_msg "Screen session of \$LOGNAME \$:cr:\$:nl:ended."
-
 vbell on
 vbell_msg "     *** DING *** ---- *** DING ***     "
-
 escape ^Oo
 defutf8 on
 hardstatus on
 hardstatus alwayslastline
-# hardstatus string "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %c "
 hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %{W}%c:%s %{g}]'
-# caption always "%{= KW}%-w%{= gW}%n %t%{-}%+w %-="
-# hardstatus alwayslastline "%{= kW} %-= %{= kB}Session:%u%{= kW} %5` | %{= kB}Host:%{= kW} %H | %1` |%{= kB} MEM:%{= kW} %2`MB /%{= kB} SW: %{= kW}%3`MB | %4` %{= kR}Unread %{= kW}| %d/%m %c"
-
-# xterm stuff
 termcapinfo xterm-256color 'hs:ts=\E]2;:fs=\007:ds=\E]0;screen\007'
-
-# windowlist string "%4n %h%=%f"
-
-#show/hide hardstatus
 bindkey "^[[1;3B" eval "hardstatus ignore"
 bindkey "^[[1;3A" eval "hardstatus alwayslastline"
-# bind s eval "hardstatus ignore"
-# bind ^s eval "hardstatus alwayslastline"
-
-# Copy/buffer mode, change keys to be more emacs'ish
 markkeys @=L=H:$=^E:q=^G:^=^A
-
-# don't care about case when searching in buffer
 ignorecase on
-
-# bind ALT ( ^[ ) to activate a command class
-#bind "^[" eval  "command -c alt_key" "echo \"command class: alt_key pressed\""
-# ALT-y Slurp xselection into screen buffer:
-#bind -c alt_key y exec sh -c "xsel -nbo > $HOME/.cache/screen-exchange && screen -X readbuf"
-# ALT-w Dump ^w screen buffer into xselection:
-#bind -c alt_key w eval "writebuf" "exec sh -c 'xsel -b < $HOME/.cache/screen-exchange'"
-
-# Use ALT-left and ALT-right | prev/next window
 bindkey "^[[1;3D" prev
 bindkey "^[[1;3C" next
-# bindkey "^[[" prev
-# bindkey "^[]" next
-
-# Paste xselection into screen (Could be ^y, if not for my xterm settings!)
-bind y exec .!. xsel -nbo
-# ALT-y Slurp xselection into screen buffer:
-bindkey "^[y" exec sh -c "xsel -nbo > $HOME/.cache/screen-exchange && screen -X readbuf"
-# ALT-w Dump screen buffer into xselection:
-bindkey "^[w" eval "writebuf" "exec sh -c 'xsel -b < $HOME/.cache/screen-exchange'"
-
-# EscapeKey+r puts Screen into resize mode. Resize regions using hjkl keys, toggle focus with Tab and arrow keys.
 bind r eval "command -c classresize" # enter resize mode
-
-# use hjkl keys to resize regions
 bind -c classresize b eval "resize -h -5" "command -c classresize"
 bind -c classresize n eval "resize -v -5" "command -c classresize"
 bind -c classresize p eval "resize -v +5" "command -c classresize"
 bind -c classresize f eval "resize -h +5" "command -c classresize"
-
-# quickly switch between regions using tab and arrows
 bind -c classresize \t    eval "focus"       "command -c classresize" # Tab Key
 bind -c classresize -k kl eval "focus left"  "command -c classresize" # Arrow Left
 bind -c classresize -k kr eval "focus right" "command -c classresize" # Arrow Right
 bind -c classresize -k ku eval "focus up"    "command -c classresize" # Arrow Up
 bind -c classresize -k kd eval "focus down"  "command -c classresize" # Arrow Down
-
-# TODO: shift-pg up/down to view scrollback
-# bindkey "^[[5;2~" eval "copy" "stuff ^u"
-# bindkey -m "^[[5;2~" stuff ^u
-# bindkey -m "^[[6;2~" stuff ^d
-
 deflog on
 logfile $HOME/.logs/screen_%d-%m-%Y_%0c
 logfile flush 5
 logstamp on
 logstamp after 60
-#logstamp string '-- %n:%t -- time-stamp -- %M/%d/%y %c:%s --\n'
-
-# screen -t root 0 sudo su -
 bind R screen -t -=root=- 0 sudo su -
-screen -t syslog 1 journalctl -fn -l
-chdir $HOME/Documents/src
-screen -t src 2
-screen  -t pry 3
-screen -t misc 4
+screen -t docker-stats 1 $SHELL -c 'docker ps --format "{{ .Names }}" | xargs docker stats'
+chdir $HOME
+screen -t dkr
+screen  -t ops
+screen -t misc
 select 2
