@@ -1,4 +1,4 @@
-# Path to your oh-my-zsh installation.
+# -*- shell-script -*-
 export ZSH=$HOME/.oh-my-zsh
 
 if [ -z $STY ]
